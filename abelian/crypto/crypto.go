@@ -169,7 +169,7 @@ func GenerateRandSeedsByRootSeedsFromPublicRand(rootSeedBytes []byte, publicRand
 		log.Errorf("expected crypto scheme %d, but got %d ", CryptoSchemePQRingCTX, rootSeeds.cryptoScheme)
 		return nil, fmt.Errorf("expected crypto scheme %d, but got %d ", CryptoSchemePQRingCTX, rootSeeds.cryptoScheme)
 	}
-	if rootSeeds.privacyLevel != PrivacyLevelFullPrivacyRand && rootSeeds.privacyLevel != PrivacyLevelPseudonym {
+	if rootSeeds.privacyLevel != PrivacyLevelFullPrivacyRand && rootSeeds.privacyLevel != PrivacyLevelPseudonym && rootSeeds.privacyLevel != PrivacyLevelPseudonymCT {
 		log.Errorf("invalid privacy level %d for crypto scheme %d", rootSeeds.privacyLevel, rootSeeds.cryptoScheme)
 		return nil, fmt.Errorf("invalid privacy level %d for crypto scheme %d", rootSeeds.privacyLevel, rootSeeds.cryptoScheme)
 	}
