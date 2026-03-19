@@ -204,7 +204,7 @@ func NewRootSeeds(cryptoScheme CryptoScheme, privacyLevel PrivacyLevel,
 	if cryptoScheme != CryptoSchemePQRingCTX {
 		return nil, ErrInvalidCryptoScheme
 	}
-	if privacyLevel != PrivacyLevelFullPrivacyRand && privacyLevel != PrivacyLevelPseudonym {
+	if privacyLevel != PrivacyLevelFullPrivacyRand && privacyLevel != PrivacyLevelPseudonym && privacyLevel != PrivacyLevelPseudonymCT {
 		return nil, ErrInvalidPrivacyLevel
 	}
 
@@ -245,7 +245,7 @@ func NewRandSeeds(cryptoScheme CryptoScheme, privacyLevel PrivacyLevel,
 		}
 		seed.coinValueKeySeed = coinValueKeySeed
 	case CryptoSchemePQRingCTX:
-		if privacyLevel != PrivacyLevelFullPrivacyRand && privacyLevel != PrivacyLevelPseudonym {
+		if privacyLevel != PrivacyLevelFullPrivacyRand && privacyLevel != PrivacyLevelPseudonym && privacyLevel != PrivacyLevelPseudonymCT {
 			return nil, ErrInvalidPrivacyLevel
 		}
 
