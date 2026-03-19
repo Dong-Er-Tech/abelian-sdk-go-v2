@@ -193,7 +193,8 @@ func NewTxDescWithRing(txInDescs []*TxInDescWithRing, txOutDescs []*TxOutDesc, t
 }
 
 type UnsignedRawTx struct {
-	Data []byte
+	Data      []byte
+	TxVersion uint32
 }
 
 type TxBlockDesc struct {
@@ -252,8 +253,15 @@ func GenerateUnsignedRawTx(txDesc *TxDesc) (*UnsignedRawTx, error) {
 		return nil, err
 	}
 
+	// Determine txVersion from the input coins
+	txVersion := uint32(3) // default
+	if len(txDesc.TxInDescs) > 0 {
+		txVersion = txDesc.TxInDescs[0].TxVersion
+	}
+
 	return &UnsignedRawTx{
-		Data: serializedTxRequestDesc,
+		Data:      serializedTxRequestDesc,
+		TxVersion: txVersion,
 	}, nil
 }
 
@@ -311,8 +319,14 @@ func GenerateUnsignedRawTxWithRing(txDesc *TxDescWithRing) (*UnsignedRawTx, erro
 		return nil, err
 	}
 
+	txVersion := uint32(3)
+	if len(txDesc.TxInDescs) > 0 {
+		txVersion = txDesc.TxInDescs[0].TxVersion
+	}
+
 	return &UnsignedRawTx{
-		Data: serializedTxRequestDesc,
+		Data:      serializedTxRequestDesc,
+		TxVersion: txVersion,
 	}, nil
 }
 
@@ -348,7 +362,7 @@ func GenerateSignedRawTx(unsignedRawTx *UnsignedRawTx, signerAccounts []Account)
 				coinDetectorKeyMaterial,
 			))
 		}
-		serializedTxFull, txid, err = api.CreateTransferTxByRootSeed(unsignedRawTx.Data, seeds)
+		serializedTxFull, txid, err = api.CreateTransferTxByRootSeed(unsignedRawTx.TxVersion, unsignedRawTx.Data, seeds)
 		if err != nil {
 			sdkLog.Errorf("fail to create transfer tx by root seed: %v", err)
 			return nil, err
@@ -370,7 +384,7 @@ func GenerateSignedRawTx(unsignedRawTx *UnsignedRawTx, signerAccounts []Account)
 		}
 
 		// Call API to create the signed raw tx.
-		serializedTxFull, txid, err = api.CreateTransferTxByCryptoKeys(unsignedRawTx.Data, cryptoKeys)
+		serializedTxFull, txid, err = api.CreateTransferTxByCryptoKeys(unsignedRawTx.TxVersion, unsignedRawTx.Data, cryptoKeys)
 		if err != nil {
 			sdkLog.Errorf("fail to create transfer tx by crypto keys: %v", err)
 			return nil, err

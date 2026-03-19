@@ -2,7 +2,7 @@ package crypto
 
 import api "github.com/pqabelian/abec/sdkapi/v2"
 
-func GenerateTransferTransactionByRootSeeds(transactionRequest []byte, serializedCryptoSeeds [][]byte) ([]byte, []byte, error) {
+func GenerateTransferTransactionByRootSeeds(txVersion uint32, transactionRequest []byte, serializedCryptoSeeds [][]byte) ([]byte, []byte, error) {
 	var err error
 	cryptoRootSeeds := make([]*CryptoSeeds, len(serializedCryptoSeeds))
 	for i := 0; i < len(serializedCryptoSeeds); i++ {
@@ -23,7 +23,7 @@ func GenerateTransferTransactionByRootSeeds(transactionRequest []byte, serialize
 			currentRootSeed.coinDetectorKey,
 		)
 	}
-	serializedTxFull, txId, err := api.CreateTransferTxByRootSeed(transactionRequest, apiCryptoSeeds)
+	serializedTxFull, txId, err := api.CreateTransferTxByRootSeed(txVersion, transactionRequest, apiCryptoSeeds)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -32,6 +32,7 @@ const (
 	PrivacyLevelFullPrivacyPre  PrivacyLevel = api.PrivacyLevelRINGCTPre // for back-compatibility
 	PrivacyLevelFullPrivacyRand              = api.PrivacyLevelRINGCT
 	PrivacyLevelPseudonym                    = api.PrivacyLevelPSEUDONYM
+	PrivacyLevelPseudonymCT                  = api.PrivacyLevelPSEUDONYMCT
 )
 
 func GetCryptoSchemeParamSeedBytesLen(cryptoScheme CryptoScheme) (int, error) {

@@ -14,7 +14,7 @@ func main() {
 	}
 	fmt.Printf("chain info: %#+v\n", info)
 
-	height := int32(0)
+	height := int64(0)
 	blockID, err := client.GetBlockHash(height)
 	if err != nil {
 		panic(fmt.Errorf("fail to get block id: %v", err))

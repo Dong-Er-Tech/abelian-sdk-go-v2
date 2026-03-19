@@ -12,6 +12,7 @@ const (
 	AccountPrivacyLevelFullPrivacyOld AccountPrivacyLevel = 0
 	AccountPrivacyLevelFullPrivacy    AccountPrivacyLevel = 1
 	AccountPrivacyLevelPseudonym      AccountPrivacyLevel = 2
+	AccountPrivacyLevelPseudonymCT    AccountPrivacyLevel = 3
 )
 
 func NewAccount(networkID NetworkID, accountPrivacyLevel AccountPrivacyLevel) (Account, error) {
@@ -39,6 +40,8 @@ func NewAccount(networkID NetworkID, accountPrivacyLevel AccountPrivacyLevel) (A
 	case AccountPrivacyLevelFullPrivacy:
 		// nothing to do
 	case AccountPrivacyLevelPseudonym:
+		// nothing to do
+	case AccountPrivacyLevelPseudonymCT:
 		// nothing to do
 	default:
 		return nil, fmt.Errorf("invalid privacy level for account")
@@ -75,6 +78,10 @@ func getCryptoSchemeAndPrivacyLevel(accountPrivacyLevel AccountPrivacyLevel) (cr
 	case AccountPrivacyLevelPseudonym:
 		cryptoScheme = crypto.CryptoSchemePQRingCTX
 		privacyLevel = crypto.PrivacyLevelPseudonym
+		break
+	case AccountPrivacyLevelPseudonymCT:
+		cryptoScheme = crypto.CryptoSchemePQRingCTX
+		privacyLevel = crypto.PrivacyLevelPseudonymCT
 		break
 	default:
 		panic("unsupported privacy level of account")

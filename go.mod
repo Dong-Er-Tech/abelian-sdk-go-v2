@@ -23,3 +23,5 @@ require (
 	github.com/pqabelian/pqringctx v0.0.0-20240724125306-0783f8ceef6b // indirect
 	golang.org/x/sys v0.26.0 // indirect
 )
+
+replace github.com/pqabelian/abec => github.com/Dong-Er-Tech/abec v0.0.0-20260126100013-7f1b38ecf449

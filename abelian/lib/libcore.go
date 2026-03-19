@@ -553,7 +553,9 @@ func GenerateRawTxData(argsData []byte) *C.char {
 	}
 
 	// Do real work.
-	serializedTx, txID, err := core.GenerateTransferTransactionByRootSeeds(serializedTxRequest, signerCryptoSeeds)
+	// txVersion 3 is the current Abelian transaction version
+	txVersion := uint32(3)
+	serializedTx, txID, err := core.GenerateTransferTransactionByRootSeeds(txVersion, serializedTxRequest, signerCryptoSeeds)
 	panicIf(err)
 
 	// Marshal result and return it.
