@@ -192,9 +192,19 @@ func NewTxDescWithRing(txInDescs []*TxInDescWithRing, txOutDescs []*TxOutDesc, t
 	}
 }
 
+func NewTxDescWithRingWithMemo(txInDescs []*TxInDescWithRing, txOutDescs []*TxOutDesc, txFee int64, txMemo []byte) *TxDescWithRing {
+	return &TxDescWithRing{
+		TxInDescs:  txInDescs,
+		TxOutDescs: txOutDescs,
+		TxFee:      txFee,
+		TxMemo:     txMemo,
+	}
+}
+
 type UnsignedRawTx struct {
-	Data      []byte
-	TxVersion uint32
+	Data       []byte
+	TxVersion  uint32
+	AutWitness []byte
 }
 
 type TxBlockDesc struct {
@@ -398,6 +408,52 @@ func GenerateSignedRawTx(unsignedRawTx *UnsignedRawTx, signerAccounts []Account)
 		TxID: txid.String(),
 	}, nil
 }
+
+func GenerateSignedRawTxForCTAUT(unsignedRawTx *UnsignedRawTx, signerAccounts []Account) (*SignedRawTx, error) {
+	if len(signerAccounts) == 0 {
+		return nil, fmt.Errorf("no signer specified")
+	}
+	firstAccountType := signerAccounts[0].AccountType()
+	for i := 1; i < len(signerAccounts); i++ {
+		if signerAccounts[i].AccountType() != firstAccountType {
+			return nil, fmt.Errorf("all specified accounts must be the same type")
+		}
+	}
+
+	var serializedTxFull []byte
+	var txid *api.TxId
+	var err error
+	switch firstAccountType {
+	case AccountTypeSeeds:
+		seeds := make([]*api.CryptoRootSeed, 0, len(signerAccounts))
+		for i := 0; i < len(signerAccounts); i++ {
+			coinSerialNumberKeyMaterial, coinValueKeyMaterial, coinDetectorKeyMaterial := signerAccounts[i].ViewKeyMaterial()
+			coinSpendSecretKeyMaterial := signerAccounts[i].SpendKeyMaterial()
+			signerViewAccount := signerAccounts[i].(*RootSeedAccount)
+			seeds = append(seeds, api.NewRootSeed(
+				signerViewAccount.cryptoScheme,
+				signerViewAccount.privacyLevel,
+				coinSpendSecretKeyMaterial,
+				coinSerialNumberKeyMaterial,
+				coinValueKeyMaterial,
+				coinDetectorKeyMaterial,
+			))
+		}
+		serializedTxFull, txid, err = api.CreateTransferTxByRootSeedForCTAUT(unsignedRawTx.Data, unsignedRawTx.AutWitness, seeds)
+		if err != nil {
+			sdkLog.Errorf("fail to create CTAUT transfer tx by root seed: %v", err)
+			return nil, err
+		}
+	default:
+		return nil, fmt.Errorf("CTAUT signing only supports RootSeed accounts")
+	}
+
+	return &SignedRawTx{
+		Data: serializedTxFull,
+		TxID: txid.String(),
+	}, nil
+}
+
 func getSerializedBlocksForRingGroup(ringBlockDescs map[int64]*TxBlockDesc) [][]byte {
 	heights := make([]int64, 0, len(ringBlockDescs))
 	for height := range ringBlockDescs {
