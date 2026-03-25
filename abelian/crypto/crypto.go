@@ -278,6 +278,34 @@ func DecodeCoinAddressFromSerializedTxOutData(txVersion uint32, txOutData []byte
 	return NewCoinAddress(coinAddressData)
 }
 
+func ExtractPublicRandFromTxo(txVersion uint32, serializedTxOut []byte) ([]byte, error) {
+	return api.ExtractPublicRandFromTxo(txVersion, serializedTxOut)
+}
+
+func PrivacyLevelPseudonymTxoCoinParse(txVersion uint32, serializedTxOut []byte) (value uint64, err error) {
+	return api.PrivacyLevelPseudonymTxoCoinParse(txVersion, serializedTxOut)
+}
+
+// AutTokenType represents the type of AUT token (public or hidden)
+type AutTokenType = api.AutTokenType
+
+const (
+	AutTokenTypeHidden = api.AutTokenTypeHidden
+	AutTokenTypePublic = api.AutTokenTypePublic
+)
+
+func ExtractCTAUTTokenValue(version uint32, valueScript []byte, cryptoVpk []byte, cryptoVsk []byte) (uint64, AutTokenType, error) {
+	value, tokenType, err := api.ExtractAutTokenValue(version, valueScript, cryptoVpk, cryptoVsk)
+	if err != nil {
+		return 0, AutTokenTypeHidden, err
+	}
+	return value, tokenType, err
+}
+
+func CryptoValueKeyGen(coinValueKeySeed []byte, publicRand []byte) ([]byte, []byte, error) {
+	return api.CryptoValueKeyReGenByRootSeedsFromPublicRand(api.CryptoSchemePQRingCTX, api.PrivacyLevelPSEUDONYMCT, coinValueKeySeed, publicRand)
+}
+
 type OutPoint = api.OutPoint
 
 func NewOutPointFromTxId(txID string, index uint8) (*OutPoint, error) {
